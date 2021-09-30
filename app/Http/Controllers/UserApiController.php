@@ -178,7 +178,7 @@ class UserApiController extends Controller
             $data = $request->all();
             $user = User::where('id', $data['id'] );
             $user->delete();
-            $message = "Json User Deleted successfully";
+            $message = "Json Single User Deleted successfully";
             return response()->json( [ 'message' => $message ], 200 );
         }
 
@@ -194,6 +194,21 @@ class UserApiController extends Controller
 
         $message = "Multiple User Deleted successfully";
         return response()->json( [ 'message' => $message ], 200 );
+    }
+
+
+    public function deleteMultiUserJson( Request $request ) {
+
+        if ( $request->isMethod('delete')) {
+            $data = $request->all();
+            $user = User::whereIn('id', $data['ids'] );
+            $user->delete();
+            
+            $message = "Json Multiple User Deleted successfully";
+            return response()->json( [ 'message' => $message ], 200 );
+        }
+
+
     }
     
 
