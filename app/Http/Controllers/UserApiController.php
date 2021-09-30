@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class UserApiController extends Controller
@@ -217,6 +218,51 @@ class UserApiController extends Controller
                 $message = "Authorization dose not match";
                 return response()->json( [ 'message' => $message ], 422 );
             }
+        }
+    }
+
+    public function registerUserUsingPassport( Request $request ) {
+        if( $request->isMethod('post')) {
+
+            $data = $request->all();
+
+            $rules = [
+                'name' => 'required',
+                'email' => 'required|email|unique:users',
+                'password' => 'required',
+            ];
+
+            $message = [
+                'name.required' => 'Name field is required',
+                'email.required' => 'Email field is required',
+                'email.email' => 'Must be Valid email required',
+                'password.required' => 'required',
+            ];
+            $validator = Validator::make( $data, $rules, $message );
+
+            if ( $validator->fails() ) {
+                return response()->json( $validator->errors(), 422 );
+            }
+
+            $user = new User();
+
+            $user->name = $data['name'];
+            $user->email = $data['email'];
+            $user->password = bcrypt( $data['password'] );
+            $user->save();
+
+            if ( Auth::attempt(['email' => $data['email'], 'password' => $data['password']])) {
+                $user = User::where('email', $data['email'])->first();
+                $access_token = $user->createToken($data['email'])->accessToken;
+                User::where('email', $data['email'])->update(['access_token'=> $access_token]);
+
+                $message = "User Register successfully";
+                return response()->json( [ 'message' => $message, 'access_token' => $access_token ], 201 );
+            } else {
+                $message = "Opps Somthing went Wrong";
+                return response()->json( [ 'message' => $message ], 422 );
+            }
+
         }
     }
 

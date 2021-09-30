@@ -29,3 +29,6 @@ Route::delete('/delete-single-user/{id}', [UserApiController::class,'deleteSingl
 Route::delete('/delete-single-user-json', [UserApiController::class,'deleteSingleUserJson']);
 Route::delete('/delete-multi-user/{ids}', [UserApiController::class,'deleteMultiUser']);
 Route::delete('/delete-multi-user-json', [UserApiController::class,'deleteMultiUserJson']);
+
+
+Route::post('/register-user-using-passport', [UserApiController::class,'registerUserUsingPassport']);
