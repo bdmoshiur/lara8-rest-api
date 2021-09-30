@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 class UserApiController extends Controller
 {
     public function showUser( $id = null ) {
+
         if ( $id =='' ) {
             $users = User::all();
             return response()->json([ 'users' => $users ], 200);
@@ -95,7 +96,7 @@ class UserApiController extends Controller
         }
     }
 
-     public function updateUser( Request $request, $id ) {
+     public function updateUser( Request $request, $id = null ) {
     
         if( $request->isMethod('put')) {
 
@@ -124,13 +125,13 @@ class UserApiController extends Controller
 
             $message = "User Updated successfully";
 
-            return response()->json( [ 'message' => $message ], 202 );;
+            return response()->json( [ 'message' => $message ], 202 );
 
         }
 
     }
 
-    public function updateSingleUser( Request $request, $id ) {
+    public function updateSingleUser( Request $request, $id = null ) {
     
         if( $request->isMethod('patch')) {
 
@@ -154,12 +155,46 @@ class UserApiController extends Controller
             $user->name = $data['name'];
             $user->save();
 
-            $message = "User Updated successfully";
+            $message = "Single User Updated successfully";
 
-            return response()->json( [ 'message' => $message ], 202 );;
+            return response()->json( [ 'message' => $message ], 202 );
 
         }
 
     }
+    
+    public function deleteSingleUser( $id = null ) {
+
+            $user = User::findOrFail( $id );
+            $user->delete();
+
+            $message = "User Deleted successfully";
+            return response()->json( [ 'message' => $message ], 200 );
+    }
+
+    public function deleteSingleUserJson( Request $request ) {
+
+        if ( $request->isMethod('delete')) {
+            $data = $request->all();
+            $user = User::where('id', $data['id'] );
+            $user->delete();
+            $message = "Json User Deleted successfully";
+            return response()->json( [ 'message' => $message ], 200 );
+        }
+
+
+    }
+
+
+    public function deleteMultiUser( $ids = null ) {
+
+        $ids = explode( ',', $ids );
+        $user = User::whereIn('id', $ids );
+        $user->delete();
+
+        $message = "Multiple User Deleted successfully";
+        return response()->json( [ 'message' => $message ], 200 );
+    }
+    
 
 }
